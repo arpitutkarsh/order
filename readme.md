@@ -5,7 +5,7 @@ A simple backend project to manage customer orders using **Node.js**, **Express*
 ---
 
 ## Index
-- [Features](#-features)
+- [Features](#-Features)
 - [Technologies Used](#-tech-used)
 - [Project Structure](#-project-structure)
 - [Setup Instructions](#-setup-instructions)
