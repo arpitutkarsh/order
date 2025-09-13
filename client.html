@@ -10,8 +10,14 @@
     th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
     th { background-color: #f4f4f4; }
     tr:nth-child(even) { background-color: #fafafa; }
+
+
+    .highlight {
+      background-color: #fff59d;
+    }
+    
   </style>
-  <!-- Axios CDN -->
+
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
@@ -33,22 +39,21 @@
   <script>
     const tableBody = document.getElementById("orders");
 
-    function renderOrders(orders) {
+    function renderOrders(orders, changedId = null) {
       tableBody.innerHTML = "";
       orders.forEach(order => {
         const row = document.createElement("tr");
+        row.setAttribute("data-id", order._id);
+
         let statusColor = "";
         if(order.status === "pending") statusColor = "#FACC15";
         else if(order.status === "shipped") statusColor = "#38BDF8";
         else if(order.status === "delivered") statusColor = "#4ADE80";
         else if(order.status === "cancelled") statusColor = "#F87171";
         else if(order.status === "returned") statusColor = "#FB923C";
-        let status = ""
-        if(order.status === "pending") status = "Pending";
-        else if(order.status === "shipped") status = "Shipped";
-        else if(order.status === "delivered") status = "Delivered";
-        else if(order.status === "cancelled") status = "Cancelled";
-        else if(order.status === "returned") status = "Returned";
+
+        let status = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+
         row.innerHTML = `
           <td>${order.id}</td>
           <td>${order.customer_name}</td>
@@ -57,11 +62,16 @@
           <td>${new Date(order.createdAt).toLocaleString()}</td>
           <td>${new Date(order.updatedAt).toLocaleString()}</td>
         `;
+
+        if (order._id === changedId) {
+          row.classList.add("highlight");
+        }
+
         tableBody.appendChild(row);
       });
     }
 
-    
+    // Fetch initial data on page load
     axios.get("http://localhost:5000/api/v1/orders")
       .then(response => {
         if (response.data?.data?.orders) {
@@ -79,7 +89,7 @@
       const msg = JSON.parse(event.data);
       if (msg.type === "orders_update") {
         const orders = msg.payload.sort((a, b) => a.id - b.id);
-        renderOrders(orders);
+        renderOrders(orders, msg.changedId);
       }
     };
 

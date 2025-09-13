@@ -3,7 +3,7 @@ import { Order } from "../models/order.model.js";
 
 export function realTime(server) {
     const socketServer = new WebSocketServer({ server });
-    const clients = new Set(); // use Set for easier add/remove
+    const clients = new Set();
 
     socketServer.on("connection", (ws) => {
         console.log("Client connected");
@@ -24,7 +24,8 @@ export function realTime(server) {
             const orders = await Order.find().sort({ createdAt: -1 });
             const data = JSON.stringify({
                 type: "orders_update",
-                payload: orders
+                payload: orders,
+                changedId: change.documentKey?._id
             });
 
             for (const client of clients) {
