@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-Time Orders</title>
+  <style>
+    .underline { font-style: italic; text-decoration: underline; }
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    h2 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    tr:nth-child(even) { background-color: #fafafa; }
+  </style>
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h2 class="underline">Order Updates</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="font-style: italic;">#Order ID</th>
+        <th>Customer Name</th>
+        <th>Product Name</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+      </tr>
+    </thead>
+    <tbody id="orders"></tbody>
+  </table>
+
+  <script>
+    const tableBody = document.getElementById("orders");
+
+    function renderOrders(orders) {
+      tableBody.innerHTML = "";
+      orders.forEach(order => {
+        const row = document.createElement("tr");
+        let statusColor = "";
+        if(order.status === "pending") statusColor = "#FACC15";
+        else if(order.status === "shipped") statusColor = "#38BDF8";
+        else if(order.status === "delivered") statusColor = "#4ADE80";
+        else if(order.status === "cancelled") statusColor = "#F87171";
+        else if(order.status === "returned") statusColor = "#FB923C";
+        let status = ""
+        if(order.status === "pending") status = "Pending";
+        else if(order.status === "shipped") status = "Shipped";
+        else if(order.status === "delivered") status = "Delivered";
+        else if(order.status === "cancelled") status = "Cancelled";
+        else if(order.status === "returned") status = "Returned";
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.customer_name}</td>
+          <td>${order.product_name}</td>
+          <td style="background-color: ${statusColor}; font-weight: bold;">${status}</td>
+          <td>${new Date(order.createdAt).toLocaleString()}</td>
+          <td>${new Date(order.updatedAt).toLocaleString()}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    
+    axios.get("http://localhost:5000/api/v1/orders")
+      .then(response => {
+        if (response.data?.data?.orders) {
+          const orders = response.data.data.orders.sort((a, b) => a.id - b.id);
+          renderOrders(orders);
+        }
+      })
+      .catch(err => console.error("Error fetching orders:", err));
+
+    const ws = new WebSocket("ws://localhost:5000");
+
+    ws.onopen = () => console.log("WebSocket connected");
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.type === "orders_update") {
+        const orders = msg.payload.sort((a, b) => a.id - b.id);
+        renderOrders(orders);
+      }
+    };
+
+    ws.onclose = () => console.log("WebSocket closed");
+    ws.onerror = (err) => console.error("WebSocket error:", err);
+  </script>
+</body>
+</html>
