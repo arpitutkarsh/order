@@ -5,15 +5,15 @@ A simple backend project to manage customer orders using **Node.js**, **Express*
 ---
 
 ## Index
-- [Features](#-Features)
-- [Technologies Used](#-tech-used)
-- [Project Structure](#-project-structure)
-- [Setup Instructions](#-setup-instructions)
-- [Environment Variables](#-environment-variables)
-- [How It Works](#-how-it-works)
-- [API Endpoints](#-api-endpoints)
-- [Sample Data](#-sample-data)
-- [Common Issues](#-common-issues)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Setup Instructions](#setup-instructions)
+- [Environment Variables](#environment-variables)
+- [How It Works](#how-it-works)
+- [API Endpoints](#api-endpoints)
+- [Sample Data](#sample-data)
+- [Common Issues](#common-issues)
 
 ## Features
 
@@ -68,7 +68,7 @@ project-root/
 ```
 npm install
 ```
-### 2. Set Up Environment Variables
+### 2. Environment Variables
 Create a `.env` file in the `server` directory and add the following variables:
 ```
 PORT = 5000
